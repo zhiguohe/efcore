@@ -38,7 +38,7 @@ var x = a.GetAnnotations();
                 diagnostic.GetMessage());
 
             var span = diagnostic.Location.SourceSpan;
-            Assert.Equal("DisplayName", source[span.Start..span.End]);
+            Assert.Equal("DisplayName", source.Substring(span.Start, span.Start - span.End));
         }
 
         [ConditionalFact]
@@ -54,7 +54,7 @@ var x = a.GetAnnotations();
                 diagnostic.GetMessage());
 
             var span = diagnostic.Location.SourceSpan;
-            Assert.Equal("CoreSingletonOptions", source[span.Start..span.End]);
+            Assert.Equal("CoreSingletonOptions", source.Substring(span.Start, span.Start - span.End));
         }
 
         [ConditionalFact]
@@ -78,7 +78,7 @@ class MyClass : Microsoft.EntityFrameworkCore.Storage.Internal.RawRelationalPara
             var span = diagnostic.Location.SourceSpan;
             Assert.Equal(
                 "Microsoft.EntityFrameworkCore.Storage.Internal.RawRelationalParameter",
-                source[span.Start..span.End]);
+                source.Substring(span.Start, span.Start - span.End));
         }
 
         [ConditionalFact]
@@ -128,7 +128,7 @@ namespace Bar
                 diagnostic.GetMessage());
 
             var span = diagnostic.Location.SourceSpan;
-            Assert.Equal("RelationalServices", source[span.Start..span.End]);
+            Assert.Equal("RelationalServices", source.Substring(span.Start, span.Start - span.End));
         }
 
         [ConditionalFact]
@@ -147,7 +147,7 @@ namespace Bar
 
             var span = diagnostic.Location.SourceSpan;
             Assert.Equal(
-                "new Microsoft.EntityFrameworkCore.Update.UpdateSqlGeneratorDependencies(null, null)", source[span.Start..span.End]);
+                "new Microsoft.EntityFrameworkCore.Update.UpdateSqlGeneratorDependencies(null, null)", source.Substring(span.Start, span.Start - span.End));
         }
 
         #endregion Attribute

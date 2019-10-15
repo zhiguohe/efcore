@@ -68,8 +68,7 @@ namespace Microsoft.EntityFrameworkCore.Cosmos.TestUtilities
             {
                 HttpRequestException re => re.InnerException is SocketException,
                 _ => exception.Message.Contains(
-                           "The input authorization token can't serve the request. Please check that the expected payload is built as per the protocol, and check the key being used.",
-                           StringComparison.Ordinal),
+                           "The input authorization token can't serve the request. Please check that the expected payload is built as per the protocol, and check the key being used."),
             };
     }
 }

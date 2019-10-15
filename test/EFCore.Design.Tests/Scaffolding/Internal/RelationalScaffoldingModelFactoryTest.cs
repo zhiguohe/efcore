@@ -1162,7 +1162,7 @@ namespace Microsoft.EntityFrameworkCore.Internal
             public string Singularize(string name)
             {
                 return name.EndsWith("s")
-                    ? name[..^1]
+                    ? name.Substring(0, name.Length - 1)
                     : name;
             }
         }

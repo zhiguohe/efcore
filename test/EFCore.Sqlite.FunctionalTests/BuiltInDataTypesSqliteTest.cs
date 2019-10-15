@@ -1353,15 +1353,19 @@ LIMIT 1");
                         {
                             e.Id,
                             TestDecimal = e.TestDecimal / 2m,
+#if !NET472
                             TestTimeSpan1 = e.TestTimeSpan / 2.0,
                             TestTimeSpan2 = e.TestTimeSpan / new TimeSpan(0, 2, 0),
+#endif
                             TestUnsignedInt64 = e.TestUnsignedInt64 / 5ul
                         })
                     .First(e => e.Id == 214);
 
                 Assert.Equal(1.000000000000001m, result.TestDecimal);
+#if !NET472
                 Assert.Equal(TimeSpan.FromMinutes(1), result.TestTimeSpan1);
                 Assert.Equal(1.0, result.TestTimeSpan2);
+#endif
                 Assert.Equal(ulong.MaxValue / 5, result.TestUnsignedInt64);
             }
         }
@@ -1389,15 +1393,19 @@ LIMIT 1");
                         {
                             e.Id,
                             TestDecimal = e.TestDecimal * 2m,
+#if !NET472
                             TestTimeSpan1 = e.TestTimeSpan * 2.0,
                             TestTimeSpan2 = 2.0 * e.TestTimeSpan,
+#endif
                             TestUnsignedInt64 = e.TestUnsignedInt64 * 5ul
                         })
                     .First(e => e.Id == 215);
 
                 Assert.Equal(2.000000000000002m, result.TestDecimal);
+#if !NET472
                 Assert.Equal(TimeSpan.FromMinutes(2), result.TestTimeSpan1);
                 Assert.Equal(TimeSpan.FromMinutes(2), result.TestTimeSpan2);
+#endif
                 Assert.Equal(ulong.MaxValue, result.TestUnsignedInt64);
             }
         }

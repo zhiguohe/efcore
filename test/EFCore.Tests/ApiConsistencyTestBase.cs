@@ -303,14 +303,14 @@ namespace Microsoft.EntityFrameworkCore
             var parametersMissingAttribute
                 = (from type in GetAllTypes(TargetAssembly.GetTypes())
                    where type.GetTypeInfo().IsVisible && !typeof(Delegate).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo())
-                                                      && !type.Namespace.Contains("Internal", StringComparison.Ordinal)
+                                                      && !type.Namespace.Contains("Internal")
                    let interfaceMappings = type.GetInterfaces().Select(i => type.GetTypeInfo().GetRuntimeInterfaceMap(i))
                    let events = type.GetEvents()
                    from method in type.GetMethods(AnyInstance | BindingFlags.Static | BindingFlags.DeclaredOnly)
                        .Concat<MethodBase>(type.GetConstructors())
                    where (method.IsPublic || method.IsFamily || method.IsFamilyOrAssembly)
                          && ShouldHaveNotNullAnnotation(method, type)
-                         && !method.DeclaringType.Namespace.Contains("Query", StringComparison.Ordinal)
+                         && !method.DeclaringType.Namespace.Contains("Query")
                    where type.GetTypeInfo().IsInterface || !interfaceMappings.Any(im => im.TargetMethods.Contains(method))
                    where !events.Any(e => e.AddMethod == method || e.RemoveMethod == method)
                    from parameter in method.GetParameters()
@@ -434,7 +434,7 @@ namespace Microsoft.EntityFrameworkCore
 
             var parameters = (
                     from type in GetAllTypes(TargetAssembly.GetExportedTypes())
-                    where !type.Namespace.Contains("Internal", StringComparison.Ordinal)
+                    where !type.Namespace.Contains("Internal")
                     from method in type.GetTypeInfo().DeclaredMethods
                     where !method.IsPrivate
                     from parameter in method.GetParameters()

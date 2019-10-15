@@ -889,10 +889,10 @@ namespace Microsoft.EntityFrameworkCore
                 public static IDictionary<string, string> Deserialize(string s)
                 {
                     var dictionary = new Dictionary<string, string>();
-                    var keyValuePairs = s.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+                    var keyValuePairs = s.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var keyValuePair in keyValuePairs)
                     {
-                        var parts = keyValuePair[1..^1].Split(",");
+                        var parts = keyValuePair.Substring(1, keyValuePair.Length - 2).Split(',');
                         dictionary[parts[0]] = parts[1];
                     }
 

@@ -368,13 +368,21 @@ namespace Microsoft.EntityFrameworkCore.TestUtilities
         {
             if (connection.State != ConnectionState.Closed)
             {
+#if NET472
+                connection.Close();
+#else
                 await connection.CloseAsync();
+#endif
             }
 
             await connection.OpenAsync();
             try
             {
+#if NET472
+                using (var transaction = useTransaction ? connection.BeginTransaction() : null)
+#else
                 using (var transaction = useTransaction ? await connection.BeginTransactionAsync() : null)
+#endif
                 {
                     T result;
                     using (var command = CreateCommand(connection, sql, parameters))
@@ -384,7 +392,11 @@ namespace Microsoft.EntityFrameworkCore.TestUtilities
 
                     if (transaction != null)
                     {
+#if NET472
+                        transaction.Commit();
+#else
                         await transaction.CommitAsync();
+#endif
                     }
 
                     return result;
@@ -394,7 +406,11 @@ namespace Microsoft.EntityFrameworkCore.TestUtilities
             {
                 if (connection.State != ConnectionState.Closed)
                 {
+#if NET472
+                    connection.Close();
+#else
                     await connection.CloseAsync();
+#endif
                 }
             }
         }
@@ -433,7 +449,8 @@ namespace Microsoft.EntityFrameworkCore.TestUtilities
         {
             var builder = new SqlConnectionStringBuilder(TestEnvironment.DefaultConnection)
             {
-                MultipleActiveResultSets = multipleActiveResultSets ?? new Random().Next(0, 2) == 1, InitialCatalog = name
+                MultipleActiveResultSets = multipleActiveResultSets ?? new Random().Next(0, 2) == 1,
+                InitialCatalog = name
             };
             if (fileName != null)
             {
