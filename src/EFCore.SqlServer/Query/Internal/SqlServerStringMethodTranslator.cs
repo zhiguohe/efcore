@@ -79,9 +79,11 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Internal
 
                 var charIndexExpression = _sqlExpressionFactory.Subtract(
                     _sqlExpressionFactory.Function(
-                        "CHARINDEX",
-                        new[] { argument, _sqlExpressionFactory.ApplyTypeMapping(instance, stringTypeMapping) },
-                        method.ReturnType),
+                        name: "CHARINDEX",
+                        arguments: new[] { argument, _sqlExpressionFactory.ApplyTypeMapping(instance, stringTypeMapping) },
+                        canBeNull: true,
+                        argumentsNullabilityPropagation: new [] { true, true },
+                        returnType: method.ReturnType),
                     _sqlExpressionFactory.Constant(1));
 
                 return _sqlExpressionFactory.Case(
@@ -117,10 +119,12 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Internal
                 || _toUpperMethodInfo.Equals(method))
             {
                 return _sqlExpressionFactory.Function(
-                    _toLowerMethodInfo.Equals(method) ? "LOWER" : "UPPER",
-                    new[] { instance },
-                    method.ReturnType,
-                    instance.TypeMapping);
+                    name: _toLowerMethodInfo.Equals(method) ? "LOWER" : "UPPER",
+                    arguments: new[] { instance },
+                    canBeNull: true,
+                    argumentsNullabilityPropagation: new[] { true },
+                    returnType: method.ReturnType,
+                    typeMapping: instance.TypeMapping);
             }
 
             if (_substringMethodInfo.Equals(method))
@@ -147,17 +151,21 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Internal
                     _sqlExpressionFactory.IsNull(argument),
                     _sqlExpressionFactory.Equal(
                         _sqlExpressionFactory.Function(
-                            "LTRIM",
-                            new[]
+                            name: "LTRIM",
+                            arguments: new[]
                             {
                                 _sqlExpressionFactory.Function(
-                                    "RTRIM",
-                                    new[] { argument },
-                                    argument.Type,
-                                    argument.TypeMapping)
+                                    name: "RTRIM",
+                                    arguments: new[] { argument },
+                                    canBeNull: true,
+                                    argumentsNullabilityPropagation: new [] { true },
+                                    returnType: argument.Type,
+                                    typeMapping: argument.TypeMapping)
                             },
-                            argument.Type,
-                            argument.TypeMapping),
+                            canBeNull: true,
+                            argumentsNullabilityPropagation: new[] { true },
+                            returnType: argument.Type,
+                            typeMapping: argument.TypeMapping),
                         _sqlExpressionFactory.Constant(string.Empty, argument.TypeMapping)));
             }
 
@@ -167,10 +175,12 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Internal
                     && ((arguments[0] as SqlConstantExpression)?.Value as Array)?.Length == 0))
             {
                 return _sqlExpressionFactory.Function(
-                    "LTRIM",
-                    new[] { instance },
-                    instance.Type,
-                    instance.TypeMapping);
+                    name: "LTRIM",
+                    arguments: new[] { instance },
+                    canBeNull: true,
+                    argumentsNullabilityPropagation: new[] { true },
+                    returnType: instance.Type,
+                    typeMapping: instance.TypeMapping);
             }
 
             if (_trimEndMethodInfoWithoutArgs?.Equals(method) == true
@@ -179,10 +189,12 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Internal
                     && ((arguments[0] as SqlConstantExpression)?.Value as Array)?.Length == 0))
             {
                 return _sqlExpressionFactory.Function(
-                    "RTRIM",
-                    new[] { instance },
-                    instance.Type,
-                    instance.TypeMapping);
+                    name: "RTRIM",
+                    arguments: new[] { instance },
+                    canBeNull: true,
+                    argumentsNullabilityPropagation: new[] { true },
+                    returnType: instance.Type,
+                    typeMapping: instance.TypeMapping);
             }
 
             if (_trimMethodInfoWithoutArgs?.Equals(method) == true
@@ -191,17 +203,21 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Internal
                     && ((arguments[0] as SqlConstantExpression)?.Value as Array)?.Length == 0))
             {
                 return _sqlExpressionFactory.Function(
-                    "LTRIM",
-                    new[]
+                    name: "LTRIM",
+                    arguments: new[]
                     {
                         _sqlExpressionFactory.Function(
-                            "RTRIM",
-                            new[] { instance },
-                            instance.Type,
-                            instance.TypeMapping)
+                            name: "RTRIM",
+                            arguments: new[] { instance },
+                            canBeNull: true,
+                            argumentsNullabilityPropagation: new[] { true },
+                            returnType: instance.Type,
+                            typeMapping: instance.TypeMapping)
                     },
-                    instance.Type,
-                    instance.TypeMapping);
+                    canBeNull: true,
+                    argumentsNullabilityPropagation: new[] { true },
+                    returnType: instance.Type,
+                    typeMapping: instance.TypeMapping);
             }
 
             if (_containsMethodInfo.Equals(method))
@@ -220,9 +236,11 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Internal
 
                     return _sqlExpressionFactory.GreaterThan(
                         _sqlExpressionFactory.Function(
-                            "CHARINDEX",
-                            new[] { pattern, instance },
-                            typeof(int)),
+                            name: "CHARINDEX",
+                            arguments: new[] { pattern, instance },
+                            canBeNull: true,
+                            argumentsNullabilityPropagation: new [] { true, true},
+                            returnType: typeof(int)),
                         _sqlExpressionFactory.Constant(0));
                 }
 
@@ -232,9 +250,11 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Internal
                         _sqlExpressionFactory.Constant(string.Empty, stringTypeMapping)),
                     _sqlExpressionFactory.GreaterThan(
                         _sqlExpressionFactory.Function(
-                            "CHARINDEX",
-                            new[] { pattern, instance },
-                            typeof(int)),
+                            name: "CHARINDEX",
+                            arguments: new[] { pattern, instance },
+                            canBeNull: true,
+                            argumentsNullabilityPropagation: new[] { true, true },
+                            returnType: typeof(int)),
                         _sqlExpressionFactory.Constant(0)));
             }
 
@@ -288,19 +308,41 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Internal
             {
                 return _sqlExpressionFactory.Equal(
                     _sqlExpressionFactory.Function(
-                        "LEFT",
-                        new[] { instance, _sqlExpressionFactory.Function("LEN", new[] { pattern }, typeof(int)) },
-                        typeof(string),
-                        stringTypeMapping),
+                        name: "LEFT",
+                        arguments: new[]
+                        {
+                            instance,
+                            _sqlExpressionFactory.Function(
+                                name: "LEN",
+                                arguments: new[] { pattern },
+                                canBeNull: true,
+                                argumentsNullabilityPropagation: new [] { true },
+                                returnType: typeof(int))
+                        },
+                        canBeNull: true,
+                        argumentsNullabilityPropagation: new [] { true, true },
+                        returnType: typeof(string),
+                        typeMapping: stringTypeMapping),
                     pattern);
             }
 
             return _sqlExpressionFactory.Equal(
                 _sqlExpressionFactory.Function(
-                    "RIGHT",
-                    new[] { instance, _sqlExpressionFactory.Function("LEN", new[] { pattern }, typeof(int)) },
-                    typeof(string),
-                    stringTypeMapping),
+                    name: "RIGHT",
+                    arguments: new[]
+                    {
+                        instance,
+                        _sqlExpressionFactory.Function(
+                            name: "LEN",
+                            arguments: new[] { pattern },
+                            canBeNull: true,
+                            argumentsNullabilityPropagation: new [] { true },
+                            returnType: typeof(int))
+                    },
+                    canBeNull: true,
+                    argumentsNullabilityPropagation: new[] { true, true },
+                    returnType: typeof(string),
+                    typeMapping: stringTypeMapping),
                 pattern);
         }
 

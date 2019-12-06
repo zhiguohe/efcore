@@ -23,7 +23,12 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Internal
                 && instance?.Type == typeof(string))
             {
                 return _sqlExpressionFactory.Convert(
-                    _sqlExpressionFactory.Function("LEN", new[] { instance }, typeof(long)),
+                    _sqlExpressionFactory.Function(
+                        name: "LEN",
+                        arguments: new[] { instance },
+                        canBeNull: true,
+                        argumentsNullabilityPropagation: new[] { true },
+                        returnType: typeof(long)),
                     returnType);
             }
 

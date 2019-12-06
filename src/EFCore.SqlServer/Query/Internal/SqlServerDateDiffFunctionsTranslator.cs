@@ -348,9 +348,11 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Internal
                 endDate = _sqlExpressionFactory.ApplyTypeMapping(endDate, typeMapping);
 
                 return _sqlExpressionFactory.Function(
-                    "DATEDIFF",
-                    new[] { _sqlExpressionFactory.Fragment(datePart), startDate, endDate },
-                    typeof(int));
+                    name: "DATEDIFF",
+                    arguments: new[] { _sqlExpressionFactory.Fragment(datePart), startDate, endDate },
+                    canBeNull: true,
+                    argumentsNullabilityPropagation: new [] { false, true, true },
+                    returnType: typeof(int));
             }
 
             return null;

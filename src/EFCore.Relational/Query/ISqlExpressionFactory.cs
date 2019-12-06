@@ -73,24 +73,70 @@ namespace Microsoft.EntityFrameworkCore.Query
         CaseExpression Case(SqlExpression operand, params CaseWhenClause[] whenClauses);
         CaseExpression Case(IReadOnlyList<CaseWhenClause> whenClauses, SqlExpression elseResult);
 
-        SqlFunctionExpression Function(
-            string name, IEnumerable<SqlExpression> arguments, Type returnType, RelationalTypeMapping typeMapping = null);
+        //SqlFunctionExpression Function(
+        //    string name, IEnumerable<SqlExpression> arguments, Type returnType, RelationalTypeMapping typeMapping = null);
+
+        //SqlFunctionExpression Function(
+        //    string schema, string name, IEnumerable<SqlExpression> arguments, Type returnType, RelationalTypeMapping typeMapping = null);
+
+        //SqlFunctionExpression Function(
+        //    SqlExpression instance, string name, IEnumerable<SqlExpression> arguments, Type returnType,
+        //    RelationalTypeMapping typeMapping = null);
+
+        //SqlFunctionExpression Function(
+        //    string name, Type returnType, RelationalTypeMapping typeMapping = null);
+
+        //SqlFunctionExpression Function(
+        //    string schema, string name, Type returnType, RelationalTypeMapping typeMapping = null);
+
+        //SqlFunctionExpression Function(
+        //    SqlExpression instance, string name, Type returnType, RelationalTypeMapping typeMapping = null);
 
         SqlFunctionExpression Function(
-            string schema, string name, IEnumerable<SqlExpression> arguments, Type returnType, RelationalTypeMapping typeMapping = null);
-
-        SqlFunctionExpression Function(
-            SqlExpression instance, string name, IEnumerable<SqlExpression> arguments, Type returnType,
+            string name,
+            IEnumerable<SqlExpression> arguments,
+            bool canBeNull,
+            IEnumerable<bool> argumentsNullabilityPropagation,
+            Type returnType,
             RelationalTypeMapping typeMapping = null);
 
         SqlFunctionExpression Function(
-            string name, Type returnType, RelationalTypeMapping typeMapping = null);
+            string schema,
+            string name,
+            IEnumerable<SqlExpression> arguments,
+            bool canBeNull,
+            IEnumerable<bool> argumentsNullabilityPropagation,
+            Type returnType,
+            RelationalTypeMapping typeMapping = null);
 
         SqlFunctionExpression Function(
-            string schema, string name, Type returnType, RelationalTypeMapping typeMapping = null);
+            SqlExpression instance,
+            string name,
+            IEnumerable<SqlExpression> arguments,
+            bool canBeNull,
+            IEnumerable<bool> argumentsNullabilityPropagation,
+            Type returnType,
+            RelationalTypeMapping typeMapping = null);
 
         SqlFunctionExpression Function(
-            SqlExpression instance, string name, Type returnType, RelationalTypeMapping typeMapping = null);
+            string name,
+            bool canBeNull,
+            Type returnType,
+            RelationalTypeMapping typeMapping = null);
+
+        SqlFunctionExpression Function(
+            string schema,
+            string name,
+            bool canBeNull,
+            Type returnType,
+            RelationalTypeMapping typeMapping = null);
+
+        SqlFunctionExpression Function(
+            SqlExpression instance,
+            string name,
+            bool canBeNull,
+            Type returnType,
+            RelationalTypeMapping typeMapping = null);
 
         ExistsExpression Exists(SelectExpression subquery, bool negated);
         InExpression In(SqlExpression item, SqlExpression values, bool negated);

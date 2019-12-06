@@ -126,12 +126,12 @@ namespace Microsoft.EntityFrameworkCore.Query
                     .HasTranslation(args => new SqlFragmentExpression("'Two'"));
                 var isDateMethodInfo = typeof(UDFSqlContext).GetMethod(nameof(IsDateStatic));
                 modelBuilder.HasDbFunction(isDateMethodInfo)
-                    .HasTranslation(args => SqlFunctionExpression.Create("IsDate", args, isDateMethodInfo.ReturnType, null));
+                    .HasTranslation(args => SqlFunctionExpression.Create("IsDate", args, true, new bool[] { true }, isDateMethodInfo.ReturnType, null));
 
                 var methodInfo = typeof(UDFSqlContext).GetMethod(nameof(MyCustomLengthStatic));
 
                 modelBuilder.HasDbFunction(methodInfo)
-                    .HasTranslation(args => SqlFunctionExpression.Create("len", args, methodInfo.ReturnType, null));
+                    .HasTranslation(args => SqlFunctionExpression.Create("len", args, true, new bool[] { true }, methodInfo.ReturnType, null));
 
                 //Instance
                 modelBuilder.HasDbFunction(typeof(UDFSqlContext).GetMethod(nameof(CustomerOrderCountInstance)))
@@ -146,14 +146,14 @@ namespace Microsoft.EntityFrameworkCore.Query
                     .HasName("GetReportingPeriodStartDate");
                 var isDateMethodInfo2 = typeof(UDFSqlContext).GetMethod(nameof(IsDateInstance));
                 modelBuilder.HasDbFunction(isDateMethodInfo2)
-                    .HasTranslation(args => SqlFunctionExpression.Create("IsDate", args, isDateMethodInfo2.ReturnType, null));
+                    .HasTranslation(args => SqlFunctionExpression.Create("IsDate", args, true, new bool[] { true }, isDateMethodInfo2.ReturnType, null));
 
                 modelBuilder.HasDbFunction(typeof(UDFSqlContext).GetMethod(nameof(DollarValueInstance))).HasName("DollarValue");
 
                 var methodInfo2 = typeof(UDFSqlContext).GetMethod(nameof(MyCustomLengthInstance));
 
                 modelBuilder.HasDbFunction(methodInfo2)
-                    .HasTranslation(args => SqlFunctionExpression.Create("len", args, methodInfo2.ReturnType, null));
+                    .HasTranslation(args => SqlFunctionExpression.Create("len", args, true, new bool[] { true }, methodInfo2.ReturnType, null));
             }
         }
 

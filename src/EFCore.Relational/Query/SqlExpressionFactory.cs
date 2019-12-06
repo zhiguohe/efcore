@@ -340,8 +340,76 @@ namespace Microsoft.EntityFrameworkCore.Query
             return new CaseExpression(typeMappedWhenClauses, elseResult);
         }
 
+        //public virtual SqlFunctionExpression Function(
+        //    string name, IEnumerable<SqlExpression> arguments, Type returnType, RelationalTypeMapping typeMapping = null)
+        //{
+        //    var typeMappedArguments = new List<SqlExpression>();
+
+        //    foreach (var argument in arguments)
+        //    {
+        //        typeMappedArguments.Add(ApplyDefaultTypeMapping(argument));
+        //    }
+
+        //    return SqlFunctionExpression.Create(
+        //        name,
+        //        typeMappedArguments,
+        //        returnType,
+        //        typeMapping);
+        //}
+
+        //public virtual SqlFunctionExpression Function(
+        //    string schema, string name, IEnumerable<SqlExpression> arguments, Type returnType, RelationalTypeMapping typeMapping = null)
+        //{
+        //    var typeMappedArguments = new List<SqlExpression>();
+        //    foreach (var argument in arguments)
+        //    {
+        //        typeMappedArguments.Add(ApplyDefaultTypeMapping(argument));
+        //    }
+
+        //    return SqlFunctionExpression.Create(
+        //        schema,
+        //        name,
+        //        typeMappedArguments,
+        //        returnType,
+        //        typeMapping);
+        //}
+
+        //public virtual SqlFunctionExpression Function(
+        //    SqlExpression instance, string name, IEnumerable<SqlExpression> arguments, Type returnType,
+        //    RelationalTypeMapping typeMapping = null)
+        //{
+        //    instance = ApplyDefaultTypeMapping(instance);
+        //    var typeMappedArguments = new List<SqlExpression>();
+        //    foreach (var argument in arguments)
+        //    {
+        //        typeMappedArguments.Add(ApplyDefaultTypeMapping(argument));
+        //    }
+
+        //    return SqlFunctionExpression.Create(
+        //        instance,
+        //        name,
+        //        typeMappedArguments,
+        //        returnType,
+        //        typeMapping);
+        //}
+
+        //public virtual SqlFunctionExpression Function(string name, Type returnType, RelationalTypeMapping typeMapping = null)
+        //    => SqlFunctionExpression.CreateNiladic(name, returnType, typeMapping);
+
+        //public virtual SqlFunctionExpression Function(string schema, string name, Type returnType, RelationalTypeMapping typeMapping = null)
+        //    => SqlFunctionExpression.CreateNiladic(schema, name, returnType, typeMapping);
+
+        //public virtual SqlFunctionExpression Function(
+        //    SqlExpression instance, string name, Type returnType, RelationalTypeMapping typeMapping = null)
+        //    => SqlFunctionExpression.CreateNiladic(ApplyDefaultTypeMapping(instance), name, returnType, typeMapping);
+
         public virtual SqlFunctionExpression Function(
-            string name, IEnumerable<SqlExpression> arguments, Type returnType, RelationalTypeMapping typeMapping = null)
+            string name,
+            IEnumerable<SqlExpression> arguments,
+            bool canBeNull,
+            IEnumerable<bool> argumentsNullabilityPropagation,
+            Type returnType,
+            RelationalTypeMapping typeMapping = null)
         {
             var typeMappedArguments = new List<SqlExpression>();
 
@@ -353,12 +421,20 @@ namespace Microsoft.EntityFrameworkCore.Query
             return SqlFunctionExpression.Create(
                 name,
                 typeMappedArguments,
+                canBeNull,
+                argumentsNullabilityPropagation,
                 returnType,
                 typeMapping);
         }
 
         public virtual SqlFunctionExpression Function(
-            string schema, string name, IEnumerable<SqlExpression> arguments, Type returnType, RelationalTypeMapping typeMapping = null)
+            string schema,
+            string name,
+            IEnumerable<SqlExpression> arguments,
+            bool canBeNull,
+            IEnumerable<bool> argumentsNullabilityPropagation,
+            Type returnType,
+            RelationalTypeMapping typeMapping = null)
         {
             var typeMappedArguments = new List<SqlExpression>();
             foreach (var argument in arguments)
@@ -370,12 +446,19 @@ namespace Microsoft.EntityFrameworkCore.Query
                 schema,
                 name,
                 typeMappedArguments,
+                canBeNull,
+                argumentsNullabilityPropagation,
                 returnType,
                 typeMapping);
         }
 
         public virtual SqlFunctionExpression Function(
-            SqlExpression instance, string name, IEnumerable<SqlExpression> arguments, Type returnType,
+            SqlExpression instance,
+            string name,
+            IEnumerable<SqlExpression> arguments,
+            bool canBeNull,
+            IEnumerable<bool> argumentsNullabilityPropagation,
+            Type returnType,
             RelationalTypeMapping typeMapping = null)
         {
             instance = ApplyDefaultTypeMapping(instance);
@@ -389,19 +472,34 @@ namespace Microsoft.EntityFrameworkCore.Query
                 instance,
                 name,
                 typeMappedArguments,
+                canBeNull,
+                argumentsNullabilityPropagation,
                 returnType,
                 typeMapping);
         }
 
-        public virtual SqlFunctionExpression Function(string name, Type returnType, RelationalTypeMapping typeMapping = null)
-            => SqlFunctionExpression.CreateNiladic(name, returnType, typeMapping);
-
-        public virtual SqlFunctionExpression Function(string schema, string name, Type returnType, RelationalTypeMapping typeMapping = null)
-            => SqlFunctionExpression.CreateNiladic(schema, name, returnType, typeMapping);
+        public virtual SqlFunctionExpression Function(
+            string name,
+            bool canBeNull,
+            Type returnType,
+            RelationalTypeMapping typeMapping = null)
+            => SqlFunctionExpression.CreateNiladic(name, canBeNull, returnType, typeMapping);
 
         public virtual SqlFunctionExpression Function(
-            SqlExpression instance, string name, Type returnType, RelationalTypeMapping typeMapping = null)
-            => SqlFunctionExpression.CreateNiladic(ApplyDefaultTypeMapping(instance), name, returnType, typeMapping);
+            string schema,
+            string name,
+            bool canBeNull,
+            Type returnType,
+            RelationalTypeMapping typeMapping = null)
+            => SqlFunctionExpression.CreateNiladic(schema, name, canBeNull, returnType, typeMapping);
+
+        public virtual SqlFunctionExpression Function(
+            SqlExpression instance,
+            string name,
+            bool canBeNull,
+            Type returnType,
+            RelationalTypeMapping typeMapping = null)
+            => SqlFunctionExpression.CreateNiladic(ApplyDefaultTypeMapping(instance), name, canBeNull, returnType, typeMapping);
 
         public virtual ExistsExpression Exists(SelectExpression subquery, bool negated)
             => new ExistsExpression(subquery, negated, _boolTypeMapping);

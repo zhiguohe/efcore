@@ -77,6 +77,7 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Internal
                     : ExpressionExtensions.InferTypeMapping(arguments[0], arguments[1]);
 
                 var newArguments = new SqlExpression[arguments.Count];
+
                 newArguments[0] = _sqlExpressionFactory.ApplyTypeMapping(arguments[0], typeMapping);
 
                 if (arguments.Count == 2)
@@ -96,10 +97,12 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Internal
                 var argument = arguments[0];
 
                 return _sqlExpressionFactory.Function(
-                    "ROUND",
-                    new[] { argument, _sqlExpressionFactory.Constant(0), _sqlExpressionFactory.Constant(1) },
-                    method.ReturnType,
-                    argument.TypeMapping);
+                    name: "ROUND",
+                    arguments: new[] { argument, _sqlExpressionFactory.Constant(0), _sqlExpressionFactory.Constant(1) },
+                    canBeNull: true,
+                    argumentsNullabilityPropagation: new[] { true, true, false },
+                    returnType: method.ReturnType,
+                    typeMapping: argument.TypeMapping);
             }
 
             if (_roundMethodInfos.Contains(method))
@@ -108,10 +111,12 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Internal
                 var digits = arguments.Count == 2 ? arguments[1] : _sqlExpressionFactory.Constant(0);
 
                 return _sqlExpressionFactory.Function(
-                    "ROUND",
-                    new[] { argument, digits },
-                    method.ReturnType,
-                    argument.TypeMapping);
+                    name: "ROUND",
+                    arguments: new[] { argument, digits },
+                    canBeNull: true,
+                    argumentsNullabilityPropagation: new [] { true, true },
+                    returnType: method.ReturnType,
+                    typeMapping: argument.TypeMapping);
             }
 
             return null;

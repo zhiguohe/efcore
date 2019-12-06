@@ -90,11 +90,20 @@ namespace Microsoft.EntityFrameworkCore.Query
             return inputType == typeof(float)
                 ? _sqlExpressionFactory.Convert(
                     _sqlExpressionFactory.Function(
-                        "AVG", new[] { sqlExpression }, typeof(double)),
+                        name: "AVG",
+                        arguments: new[] { sqlExpression },
+                        canBeNull: true,
+                        argumentsNullabilityPropagation: new[] { false },
+                        returnType: typeof(double)),
                     sqlExpression.Type,
                     sqlExpression.TypeMapping)
                 : (SqlExpression)_sqlExpressionFactory.Function(
-                    "AVG", new[] { sqlExpression }, sqlExpression.Type, sqlExpression.TypeMapping);
+                    name: "AVG",
+                    arguments: new[] { sqlExpression },
+                    canBeNull: true,
+                    argumentsNullabilityPropagation: new[] { false },
+                    returnType: sqlExpression.Type,
+                    typeMapping: sqlExpression.TypeMapping);
         }
 
         public virtual SqlExpression TranslateCount(Expression expression = null)
@@ -106,7 +115,12 @@ namespace Microsoft.EntityFrameworkCore.Query
             }
 
             return _sqlExpressionFactory.ApplyDefaultTypeMapping(
-                _sqlExpressionFactory.Function("COUNT", new[] { _sqlExpressionFactory.Fragment("*") }, typeof(int)));
+                _sqlExpressionFactory.Function(
+                    name: "COUNT",
+                    arguments: new[] { _sqlExpressionFactory.Fragment("*") },
+                    canBeNull: true,
+                    argumentsNullabilityPropagation: new[] { false },
+                    returnType: typeof(int)));
         }
 
         public virtual SqlExpression TranslateLongCount(Expression expression = null)
@@ -118,7 +132,12 @@ namespace Microsoft.EntityFrameworkCore.Query
             }
 
             return _sqlExpressionFactory.ApplyDefaultTypeMapping(
-                _sqlExpressionFactory.Function("COUNT", new[] { _sqlExpressionFactory.Fragment("*") }, typeof(long)));
+                _sqlExpressionFactory.Function(
+                    name: "COUNT",
+                    arguments: new[] { _sqlExpressionFactory.Fragment("*") },
+                    canBeNull: true,
+                    argumentsNullabilityPropagation: new[] { false },
+                    returnType: typeof(long)));
         }
 
         public virtual SqlExpression TranslateMax(Expression expression)
@@ -129,7 +148,13 @@ namespace Microsoft.EntityFrameworkCore.Query
             }
 
             return sqlExpression != null
-                ? _sqlExpressionFactory.Function("MAX", new[] { sqlExpression }, sqlExpression.Type, sqlExpression.TypeMapping)
+                ? _sqlExpressionFactory.Function(
+                    name: "MAX",
+                    arguments: new[] { sqlExpression },
+                    canBeNull: true,
+                    argumentsNullabilityPropagation: new[] { false },
+                    returnType: sqlExpression.Type,
+                    typeMapping: sqlExpression.TypeMapping)
                 : null;
         }
 
@@ -141,7 +166,13 @@ namespace Microsoft.EntityFrameworkCore.Query
             }
 
             return sqlExpression != null
-                ? _sqlExpressionFactory.Function("MIN", new[] { sqlExpression }, sqlExpression.Type, sqlExpression.TypeMapping)
+                ? _sqlExpressionFactory.Function(
+                    name: "MIN",
+                    arguments: new[] { sqlExpression },
+                    canBeNull: true,
+                    argumentsNullabilityPropagation: new[] { false },
+                    returnType: sqlExpression.Type,
+                    typeMapping: sqlExpression.TypeMapping)
                 : null;
         }
 
@@ -161,11 +192,21 @@ namespace Microsoft.EntityFrameworkCore.Query
 
             return inputType == typeof(float)
                 ? _sqlExpressionFactory.Convert(
-                    _sqlExpressionFactory.Function("SUM", new[] { sqlExpression }, typeof(double)),
+                    _sqlExpressionFactory.Function(
+                        name: "SUM",
+                        arguments: new[] { sqlExpression },
+                        canBeNull: true,
+                        argumentsNullabilityPropagation: new[] { false },
+                        returnType: typeof(double)),
                     inputType,
-                    sqlExpression.TypeMapping)
+                    typeMapping: sqlExpression.TypeMapping)
                 : (SqlExpression)_sqlExpressionFactory.Function(
-                    "SUM", new[] { sqlExpression }, inputType, sqlExpression.TypeMapping);
+                    name: "SUM",
+                    arguments: new[] { sqlExpression },
+                    canBeNull: true,
+                    argumentsNullabilityPropagation: new[] { false },
+                    returnType: inputType,
+                    typeMapping: sqlExpression.TypeMapping);
         }
 
         private sealed class SqlTypeMappingVerifyingExpressionVisitor : ExpressionVisitor

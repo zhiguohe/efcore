@@ -25,6 +25,8 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Internal
                 ? _sqlExpressionFactory.Function(
                     "NEWID",
                     Array.Empty<SqlExpression>(),
+                    canBeNull: false,
+                    new bool[0],
                     method.ReturnType)
                 : null;
         }

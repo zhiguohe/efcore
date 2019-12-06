@@ -49,6 +49,9 @@ namespace Microsoft.EntityFrameworkCore.Query
                         dbFunction.Schema,
                         dbFunction.Name,
                         arguments,
+                        // TODO: for now
+                        canBeNull: true,
+                        argumentsNullabilityPropagation: arguments.Select(a => false),
                         method.ReturnType);
             }
 

@@ -59,6 +59,8 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Internal
                     schema: "dbo",
                     sqlFunctionExpression.Name,
                     sqlFunctionExpression.Arguments,
+                    sqlFunctionExpression.CanBeNull,
+                    sqlFunctionExpression.ArgumentsNullabilityPropagation,
                     sqlFunctionExpression.Type,
                     sqlFunctionExpression.TypeMapping);
             }
