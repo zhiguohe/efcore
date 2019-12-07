@@ -11,68 +11,127 @@ namespace Microsoft.EntityFrameworkCore.Query.SqlExpressions
 {
     public class SqlFunctionExpression : SqlExpression
     {
-        //public static SqlFunctionExpression CreateNiladic(
-        //    string name,
-        //    Type type,
-        //    RelationalTypeMapping typeMapping)
-        //    => new SqlFunctionExpression(
-        //        instance: null, schema: null, name, niladic: true, arguments: null, builtIn: true, type, typeMapping);
+        public static SqlFunctionExpression CreateNiladic(
+            string name,
+            Type type,
+            RelationalTypeMapping typeMapping)
+            => new SqlFunctionExpression(
+                instance: null,
+                schema: null,
+                name,
+                niladic: true,
+                arguments: null,
+                builtIn: true,
+                canBeNull: true,
+                argumentsNullabilityPropagation: null,
+                type,
+                typeMapping);
 
-        //public static SqlFunctionExpression CreateNiladic(
-        //    string schema,
-        //    string name,
-        //    Type type,
-        //    RelationalTypeMapping typeMapping)
-        //    => new SqlFunctionExpression(instance: null, schema, name, niladic: true, arguments: null, builtIn: true, type, typeMapping);
+        public static SqlFunctionExpression CreateNiladic(
+            string schema,
+            string name,
+            Type type,
+            RelationalTypeMapping typeMapping)
+            => new SqlFunctionExpression(
+                instance: null,
+                schema,
+                name,
+                niladic: true,
+                arguments: null,
+                builtIn: true,
+                canBeNull: true,
+                argumentsNullabilityPropagation: null,
+                type,
+                typeMapping);
 
-        //public static SqlFunctionExpression CreateNiladic(
-        //    SqlExpression instance,
-        //    string name,
-        //    Type type,
-        //    RelationalTypeMapping typeMapping)
-        //    => new SqlFunctionExpression(instance, schema: null, name, niladic: true, arguments: null, builtIn: true, type, typeMapping);
+        public static SqlFunctionExpression CreateNiladic(
+            SqlExpression instance,
+            string name,
+            Type type,
+            RelationalTypeMapping typeMapping)
+            => new SqlFunctionExpression(
+                instance,
+                schema: null,
+                name,
+                niladic: true,
+                arguments: null,
+                builtIn: true,
+                canBeNull: true,
+                argumentsNullabilityPropagation: null,
+                type,
+                typeMapping);
 
-        //public static SqlFunctionExpression Create(
-        //    SqlExpression instance,
-        //    string name,
-        //    IEnumerable<SqlExpression> arguments,
-        //    Type type,
-        //    RelationalTypeMapping typeMapping)
-        //    => new SqlFunctionExpression(instance, schema: null, name, niladic: false, arguments, builtIn: true, type, typeMapping);
+        public static SqlFunctionExpression Create(
+            SqlExpression instance,
+            string name,
+            IEnumerable<SqlExpression> arguments,
+            Type type,
+            RelationalTypeMapping typeMapping)
+            => new SqlFunctionExpression(
+                instance,
+                schema: null,
+                name,
+                niladic: false,
+                arguments,
+                builtIn: true,
+                canBeNull: true,
+                argumentsNullabilityPropagation: null,
+                type,
+                typeMapping);
 
-        //public static SqlFunctionExpression Create(
-        //    string name,
-        //    IEnumerable<SqlExpression> arguments,
-        //    Type type,
-        //    RelationalTypeMapping typeMapping)
-        //    => new SqlFunctionExpression(instance: null, schema: null, name, niladic: false, arguments, builtIn: true, type, typeMapping);
+        public static SqlFunctionExpression Create(
+            string name,
+            IEnumerable<SqlExpression> arguments,
+            Type type,
+            RelationalTypeMapping typeMapping)
+            => new SqlFunctionExpression(
+                instance: null,
+                schema: null,
+                name,
+                niladic: false,
+                arguments,
+                builtIn: true,
+                canBeNull: true,
+                argumentsNullabilityPropagation: null,
+                type,
+                typeMapping);
 
-        //public static SqlFunctionExpression Create(
-        //    string schema,
-        //    string name,
-        //    IEnumerable<SqlExpression> arguments,
-        //    Type type,
-        //    RelationalTypeMapping typeMapping)
-        //    => new SqlFunctionExpression(instance: null, schema, name, niladic: false, arguments, builtIn: false, type, typeMapping);
+        public static SqlFunctionExpression Create(
+            string schema,
+            string name,
+            IEnumerable<SqlExpression> arguments,
+            Type type,
+            RelationalTypeMapping typeMapping)
+            => new SqlFunctionExpression(
+                instance: null,
+                schema,
+                name,
+                niladic: false,
+                arguments,
+                builtIn: false,
+                canBeNull: true,
+                argumentsNullabilityPropagation: null,
+                type,
+                typeMapping);
 
-        //public SqlFunctionExpression(
-        //    SqlExpression instance,
-        //    string schema,
-        //    string name,
-        //    bool niladic,
-        //    IEnumerable<SqlExpression> arguments,
-        //    bool builtIn,
-        //    Type type,
-        //    RelationalTypeMapping typeMapping)
-        //    : base(type, typeMapping)
-        //{
-        //    Instance = instance;
-        //    Name = name;
-        //    Schema = schema;
-        //    IsNiladic = niladic;
-        //    IsBuiltIn = builtIn;
-        //    Arguments = (arguments ?? Array.Empty<SqlExpression>()).ToList();
-        //}
+        public SqlFunctionExpression(
+            SqlExpression instance,
+            string schema,
+            string name,
+            bool niladic,
+            IEnumerable<SqlExpression> arguments,
+            bool builtIn,
+            Type type,
+            RelationalTypeMapping typeMapping)
+            : base(type, typeMapping)
+        {
+            Instance = instance;
+            Name = name;
+            Schema = schema;
+            IsNiladic = niladic;
+            IsBuiltIn = builtIn;
+            Arguments = (arguments ?? Array.Empty<SqlExpression>()).ToList();
+        }
 
         public static SqlFunctionExpression CreateNiladic(
             string name,

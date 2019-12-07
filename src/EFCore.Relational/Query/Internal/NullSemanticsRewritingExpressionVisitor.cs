@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
@@ -856,7 +857,7 @@ namespace Microsoft.EntityFrameworkCore.Query.Internal
             _canOptimize = canOptimize;
 
             // TODO: #18555
-            _isNullable = true;
+            _isNullable = sqlFunctionExpression.CanBeNull;
 
             return sqlFunctionExpression.Update(newInstance, newArguments);
         }
@@ -1085,6 +1086,44 @@ namespace Microsoft.EntityFrameworkCore.Query.Internal
                             left,
                             right,
                             sqlUnaryExpression.TypeMapping);
+                }
+
+                case SqlFunctionExpression sqlFunctionExpression:
+                {
+                    if (!sqlFunctionExpression.CanBeNull)
+                    {
+                        return _sqlExpressionFactory.Constant(
+                            sqlUnaryExpression.OperatorType == ExpressionType.NotEqual,
+                            sqlUnaryExpression.TypeMapping);
+                    }
+
+                    if (sqlFunctionExpression.ArgumentsNullabilityPropagation.Any(x => x))
+                    {
+                        var result = default(SqlExpression);
+                        for (var i = 0; i < sqlFunctionExpression.Arguments.Count; i++)
+                        {
+                            if (sqlFunctionExpression.ArgumentsNullabilityPropagation[i])
+                            {
+                                var nullCheck = ProcessNullNotNull(
+                                    _sqlExpressionFactory.MakeUnary(
+                                        sqlUnaryExpression.OperatorType,
+                                        sqlFunctionExpression.Arguments[i],
+                                        sqlUnaryExpression.Type,
+                                        sqlUnaryExpression.TypeMapping),
+                                    sqlFunctionExpression.Arguments[i],
+                                    operandNullable: null);
+
+                                result = result == null
+                                    ? nullCheck
+                                    : sqlUnaryExpression.OperatorType == ExpressionType.Equal
+                                        ? _sqlExpressionFactory.OrElse(result, nullCheck)
+                                        : _sqlExpressionFactory.AndAlso(result, nullCheck);
+                            }
+                        }
+
+                        return result;
+                    }
+                    break;
                 }
             }
 

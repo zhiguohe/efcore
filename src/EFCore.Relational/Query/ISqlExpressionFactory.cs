@@ -73,24 +73,24 @@ namespace Microsoft.EntityFrameworkCore.Query
         CaseExpression Case(SqlExpression operand, params CaseWhenClause[] whenClauses);
         CaseExpression Case(IReadOnlyList<CaseWhenClause> whenClauses, SqlExpression elseResult);
 
-        //SqlFunctionExpression Function(
-        //    string name, IEnumerable<SqlExpression> arguments, Type returnType, RelationalTypeMapping typeMapping = null);
+        SqlFunctionExpression Function(
+            string name, IEnumerable<SqlExpression> arguments, Type returnType, RelationalTypeMapping typeMapping = null);
 
-        //SqlFunctionExpression Function(
-        //    string schema, string name, IEnumerable<SqlExpression> arguments, Type returnType, RelationalTypeMapping typeMapping = null);
+        SqlFunctionExpression Function(
+            string schema, string name, IEnumerable<SqlExpression> arguments, Type returnType, RelationalTypeMapping typeMapping = null);
 
-        //SqlFunctionExpression Function(
-        //    SqlExpression instance, string name, IEnumerable<SqlExpression> arguments, Type returnType,
-        //    RelationalTypeMapping typeMapping = null);
+        SqlFunctionExpression Function(
+            SqlExpression instance, string name, IEnumerable<SqlExpression> arguments, Type returnType,
+            RelationalTypeMapping typeMapping = null);
 
-        //SqlFunctionExpression Function(
-        //    string name, Type returnType, RelationalTypeMapping typeMapping = null);
+        SqlFunctionExpression Function(
+            string name, Type returnType, RelationalTypeMapping typeMapping = null);
 
-        //SqlFunctionExpression Function(
-        //    string schema, string name, Type returnType, RelationalTypeMapping typeMapping = null);
+        SqlFunctionExpression Function(
+            string schema, string name, Type returnType, RelationalTypeMapping typeMapping = null);
 
-        //SqlFunctionExpression Function(
-        //    SqlExpression instance, string name, Type returnType, RelationalTypeMapping typeMapping = null);
+        SqlFunctionExpression Function(
+            SqlExpression instance, string name, Type returnType, RelationalTypeMapping typeMapping = null);
 
         SqlFunctionExpression Function(
             string name,
