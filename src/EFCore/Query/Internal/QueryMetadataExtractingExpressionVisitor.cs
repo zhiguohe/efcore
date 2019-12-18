@@ -46,11 +46,16 @@ namespace Microsoft.EntityFrameworkCore.Query.Internal
 
                 if (genericMethodDefinition == EntityFrameworkQueryableExtensions.IgnoreQueryFiltersMethodInfo)
                 {
-                    var innerQueryable = Visit(methodCallExpression.Arguments[0]);
-
                     _queryCompilationContext.IgnoreQueryFilters = true;
 
-                    return innerQueryable;
+                    return Visit(methodCallExpression.Arguments[0]);
+                }
+
+                if (genericMethodDefinition == EntityFrameworkQueryableExtensions.IgnoreEagerLoadedNavigationsMethodInfo)
+                {
+                    _queryCompilationContext.IgnoreEagerLoadedNavigations = true;
+
+                    return Visit(methodCallExpression.Arguments[0]);
                 }
             }
 

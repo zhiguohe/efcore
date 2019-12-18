@@ -1443,9 +1443,17 @@ namespace Microsoft.EntityFrameworkCore.Query.Internal
             return uniqueName;
         }
 
-        private static void PopulateEagerLoadedNavigations(IncludeTreeNode includeTreeNode)
+        private void PopulateEagerLoadedNavigations(IncludeTreeNode includeTreeNode)
         {
             var entityType = includeTreeNode.EntityType;
+
+            if (_queryCompilationContext.IgnoreEagerLoadedNavigations
+                && !entityType.IsOwned()
+                && !entityType.HasDefiningNavigation())
+            {
+                return;
+            }
+
             var outboundNavigations
                 = entityType.GetNavigations()
                     .Concat(entityType.GetDerivedNavigations())
