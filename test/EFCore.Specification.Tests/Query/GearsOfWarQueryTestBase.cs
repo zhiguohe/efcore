@@ -7581,6 +7581,62 @@ namespace Microsoft.EntityFrameworkCore.Query
                     .Select(g => g.Key.HasValue));
         }
 
+        [ConditionalTheory]
+        [MemberData(nameof(IsAsyncData))]
+        public virtual Task Contains_on_collection_of_byte_subquery(bool async)
+        {
+            return AssertQuery(
+                async,
+                ss => ss.Set<LocustLeader>().Where(l => ss.Set<LocustLeader>().Select(ll => ll.ThreatLevelByte).Contains(l.ThreatLevelByte)));
+        }
+
+        [ConditionalTheory]
+        [MemberData(nameof(IsAsyncData))]
+        public virtual Task Contains_on_collection_of_nullable_byte_subquery(bool async)
+        {
+            return AssertQuery(
+                async,
+                ss => ss.Set<LocustLeader>().Where(l => ss.Set<LocustLeader>().Select(ll => ll.ThreatLevelNullableByte).Contains(l.ThreatLevelNullableByte)));
+        }
+
+        [ConditionalTheory]
+        [MemberData(nameof(IsAsyncData))]
+        public virtual Task Contains_on_collection_of_nullable_byte_subquery_null_constant(bool async)
+        {
+            return AssertQuery(
+                async,
+                ss => ss.Set<LocustLeader>().Where(l => ss.Set<LocustLeader>().Select(ll => ll.ThreatLevelNullableByte).Contains(null)));
+        }
+
+        [ConditionalTheory]
+        [MemberData(nameof(IsAsyncData))]
+        public virtual Task Contains_on_collection_of_nullable_byte_subquery_null_parameter(bool async)
+        {
+            var prm = default(byte?);
+
+            return AssertQuery(
+                async,
+                ss => ss.Set<LocustLeader>().Where(l => ss.Set<LocustLeader>().Select(ll => ll.ThreatLevelNullableByte).Contains(prm)));
+        }
+
+        [ConditionalTheory]
+        [MemberData(nameof(IsAsyncData))]
+        public virtual Task Contains_on_byte_array_property_using_byte_column(bool async)
+        {
+            return AssertQuery(
+                async,
+                ss => from s in ss.Set<Squad>()
+                      from l in ss.Set<LocustLeader>()
+                      where s.Banner.Contains(l.ThreatLevelByte)
+                      select new { s, l },
+                elementSorter: e => (e.s.Id, e.l.Name),
+                elementAsserter: (e, a) =>
+                {
+                    AssertEqual(e.s, a.s);
+                    AssertEqual(e.l, a.l);
+                });
+        }
+
         protected GearsOfWarContext CreateContext() => Fixture.CreateContext();
 
         protected virtual void ClearLog()

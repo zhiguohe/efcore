@@ -71,5 +71,17 @@ namespace Microsoft.EntityFrameworkCore.Query
         {
             return base.Select_subquery_single_nested_subquery2(async);
         }
+
+        [ConditionalTheory(Skip = "issue #19742")]
+        public override Task Contains_over_optional_navigation_with_null_column(bool async)
+        {
+            return base.Contains_over_optional_navigation_with_null_column(async);
+        }
+
+        [ConditionalTheory(Skip = "issue #19742")]
+        public override Task Contains_over_optional_navigation_with_null_entity_reference(bool async)
+        {
+            return base.Contains_over_optional_navigation_with_null_entity_reference(async);
+        }
     }
 }

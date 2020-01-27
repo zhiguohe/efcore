@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Utilities;
 
 namespace Microsoft.EntityFrameworkCore.Query.Internal
 {
-    public class AllAnyToContainsRewritingExpressionVisitor : ExpressionVisitor
+    public class AllAnyContainsRewritingExpressionVisitor : ExpressionVisitor
     {
         private static bool IsExpressionOfFunc(Type type, int funcGenericArgs = 2)
             => type.IsGenericType
@@ -42,6 +42,28 @@ namespace Microsoft.EntityFrameworkCore.Query.Internal
                     var containsMethod = EnumerableMethods.Contains.MakeGenericMethod(methodCallExpression.Method.GetGenericArguments()[0]);
                     return Expression.Not(Expression.Call(null, containsMethod, methodCallExpression.Arguments[0], nonParameterExpression));
                 }
+            }
+
+            if (methodCallExpression.Method.IsGenericMethod
+                && methodCallExpression.Method.GetGenericMethodDefinition() is MethodInfo containsMethodInfo
+                && containsMethodInfo.Equals(QueryableMethods.Contains)
+                && methodCallExpression.Arguments[0].NodeType is ExpressionType containsFirstArgumentNodeType
+                && (containsFirstArgumentNodeType != ExpressionType.Constant || ((ConstantExpression)methodCallExpression.Arguments[0]).IsEntityQueryable())
+                && containsFirstArgumentNodeType != ExpressionType.Parameter
+                // special case byte_array.Contains() - we don't want those to be rewritten
+                && methodCallExpression.Arguments[1].Type != typeof(byte))
+            {
+                var typeArgument = methodCallExpression.Method.GetGenericArguments()[0];
+                var anyMethod = QueryableMethods.AnyWithPredicate.MakeGenericMethod(typeArgument);
+
+                var anyLambdaParameter = Expression.Parameter(typeArgument, "p");
+                var anyLambda = Expression.Lambda(
+                    Expression.Equal(
+                        anyLambdaParameter,
+                        methodCallExpression.Arguments[1]),
+                    anyLambdaParameter);
+
+                return Expression.Call(null, anyMethod, new[] { methodCallExpression.Arguments[0], anyLambda });
             }
 
             return base.VisitMethodCall(methodCallExpression);

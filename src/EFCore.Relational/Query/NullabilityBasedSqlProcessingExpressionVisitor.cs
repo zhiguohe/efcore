@@ -207,8 +207,15 @@ namespace Microsoft.EntityFrameworkCore.Query
         {
             Check.NotNull(existsExpression, nameof(existsExpression));
 
-            return existsExpression.Update(
-                VisitInternal<SelectExpression>(existsExpression.Subquery).ResultExpression);
+            var subquery = VisitInternal<SelectExpression>(existsExpression.Subquery).ResultExpression;
+            _nullable = false;
+
+            // if subquery has predicate which evaluates to false, we can simply return false
+            return subquery.Predicate is SqlConstantExpression predicateConstant
+                && predicateConstant.Value is bool boolValue
+                && !boolValue
+                ? (SqlExpression)predicateConstant
+                : existsExpression.Update(subquery);
         }
 
         protected override Expression VisitFromSql(FromSqlExpression fromSqlExpression)
@@ -222,8 +229,8 @@ namespace Microsoft.EntityFrameworkCore.Query
 
             if (inExpression.Subquery != null)
             {
-                var (subquery, subqueryNullable) = VisitInternal<SelectExpression>(inExpression.Subquery);
-                _nullable = itemNullable || subqueryNullable;
+                var subquery = VisitInternal<SelectExpression>(inExpression.Subquery).ResultExpression;
+                _nullable = false;
 
                 return inExpression.Update(item, values: null, subquery);
             }
@@ -233,8 +240,8 @@ namespace Microsoft.EntityFrameworkCore.Query
             if (UseRelationalNulls
                 || !(inExpression.Values is SqlConstantExpression || inExpression.Values is SqlParameterExpression))
             {
-                var (values, valuesNullable) = VisitInternal<SqlExpression>(inExpression.Values);
-                _nullable = itemNullable || valuesNullable;
+                var values = VisitInternal<SqlExpression>(inExpression.Values).ResultExpression;
+                _nullable = false;
 
                 return inExpression.Update(item, values, subquery: null);
             }
@@ -265,7 +272,7 @@ namespace Microsoft.EntityFrameworkCore.Query
             if (!itemNullable
                 || (_allowOptimizedExpansion && !inExpression.IsNegated && !hasNullValue))
             {
-                _nullable = itemNullable;
+                _nullable = false;
 
                 // non_nullable IN (1, 2) -> non_nullable IN (1, 2)
                 // non_nullable IN (1, 2, NULL) -> non_nullable IN (1, 2)
@@ -275,7 +282,6 @@ namespace Microsoft.EntityFrameworkCore.Query
                 return inExpression.Update(item, inValuesExpression, subquery: null);
             }
 
-            // adding null comparison term to remove nulls completely from the resulting expression
             _nullable = false;
 
             // nullable IN (1, 2) -> nullable IN (1, 2) AND nullable IS NOT NULL (full)
