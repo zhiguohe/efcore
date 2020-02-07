@@ -1130,17 +1130,31 @@ namespace Microsoft.EntityFrameworkCore.Query
             AssertCollection(expected, actual, ordered, elementSorter, elementAsserter);
         }
 
+        protected static TResult Maybe2<TCaller, TResult>(TCaller caller, Func<TCaller, TResult> expression)
+            where TResult : class
+        {
+            return caller == null ? null : expression(caller);
+        }
+
+        protected static TResult? MaybeScalar2<TCaller, TResult>(TCaller caller, Func<TCaller, TResult?> expression)
+            where TResult : struct
+        {
+            var result = caller == null ? null : expression(caller);
+
+            return result;
+        }
+
         protected static TResult Maybe<TResult>(object caller, Func<TResult> expression)
             where TResult : class
         {
             return caller == null ? null : expression();
         }
 
-        protected static TResult? MaybeScalar<TResult>(object caller, Func<TResult?> expression)
-            where TResult : struct
-        {
-            return caller == null ? null : expression();
-        }
+        //protected static TResult? MaybeScalar<TResult>(object caller, Func<TResult?> expression)
+        //    where TResult : struct
+        //{
+        //    return caller == null ? null : expression();
+        //}
 
         protected static IEnumerable<TResult> MaybeDefaultIfEmpty<TResult>(IEnumerable<TResult> caller)
             where TResult : class

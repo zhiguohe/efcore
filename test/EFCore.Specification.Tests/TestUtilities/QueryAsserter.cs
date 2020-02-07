@@ -94,7 +94,12 @@ namespace Microsoft.EntityFrameworkCore.TestUtilities
 
             AssertRogueExecution(actual.Length, query);
 
-            var expected = expectedQuery(ExpectedData).ToArray();
+            var expectedQuery2 = expectedQuery(ExpectedData);
+            var expectedQueryExpression = expectedQuery2.Expression;
+            var rewrittenExpectedQueryExpression = new ExpectedQueryRewritingVisitor().Visit(expectedQueryExpression);
+            var newExpectedQuery = expectedQuery2.Provider.CreateQuery<TResult>(rewrittenExpectedQueryExpression);
+            var expected = newExpectedQuery.ToArray();
+            //var expected = expectedQuery(ExpectedData).ToArray();
 
             if (!assertOrder
                 && elementSorter == null)
@@ -164,7 +169,12 @@ namespace Microsoft.EntityFrameworkCore.TestUtilities
 
             AssertRogueExecution(actual.Length, query);
 
-            var expected = expectedQuery(ExpectedData).ToArray();
+            var expectedQuery2 = expectedQuery(ExpectedData);
+            var expectedQueryExpression = expectedQuery2.Expression;
+            var rewrittenExpectedQueryExpression = new ExpectedQueryRewritingVisitor().Visit(expectedQueryExpression);
+            var newExpectedQuery = expectedQuery2.Provider.CreateQuery<TResult>(rewrittenExpectedQueryExpression);
+            var expected = newExpectedQuery.ToArray();
+            //var expected = expectedQuery(ExpectedData).ToArray();
 
             TestHelpers.AssertResults(
                 expected,
@@ -237,7 +247,12 @@ namespace Microsoft.EntityFrameworkCore.TestUtilities
 
             AssertRogueExecution(actual.Count, query);
 
-            var expected = expectedQuery(ExpectedData).ToList();
+            var expectedQuery2 = expectedQuery(ExpectedData);
+            var expectedQueryExpression = expectedQuery2.Expression;
+            var rewrittenExpectedQueryExpression = new ExpectedQueryRewritingVisitor().Visit(expectedQueryExpression);
+            var newExpectedQuery = expectedQuery2.Provider.CreateQuery<TResult>(rewrittenExpectedQueryExpression);
+            var expected = newExpectedQuery.ToList();
+            //var expected = expectedQuery(ExpectedData).ToList();
 
             if (!assertOrder
                 && elementSorter == null)

@@ -849,7 +849,7 @@ namespace Microsoft.EntityFrameworkCore.Query
             return AssertQueryScalar(
                 async,
                 ss => ss.Set<NullSemanticsEntity1>().OrderBy(e => e.Id).Select(e => e.NullableStringA.IndexOf("oo")),
-                ss => ss.Set<NullSemanticsEntity1>().OrderBy(e => e.Id).Select(e => MaybeScalar<int>(e.NullableStringA, () => e.NullableStringA.IndexOf("oo")) ?? 0),
+                ss => ss.Set<NullSemanticsEntity1>().OrderBy(e => e.Id).Select(e => MaybeScalar2<string, int>(e.NullableStringA, x => x.IndexOf("oo")) ?? 0),
                 assertOrder: true);
         }
 
@@ -861,25 +861,25 @@ namespace Microsoft.EntityFrameworkCore.Query
                 async,
                 ss => ss.Set<NullSemanticsEntity1>().Where(e => e.NullableStringA.IndexOf("oo") == e.NullableStringB.IndexOf("ar")).Select(e => e.Id),
                 ss => ss.Set<NullSemanticsEntity1>().Where(
-                    e => MaybeScalar<int>(e.NullableStringA, () => e.NullableStringA.IndexOf("oo"))
-                        == MaybeScalar<int>(
-                            e.NullableStringB, () => e.NullableStringB.IndexOf("ar"))).Select(e => e.Id));
+                    e => MaybeScalar2<string, int>(e.NullableStringA, x => x.IndexOf("oo"))
+                        == MaybeScalar2<string, int>(
+                            e.NullableStringB, x => x.IndexOf("ar"))).Select(e => e.Id));
 
             await AssertQueryScalar(
                 async,
                 ss => ss.Set<NullSemanticsEntity1>().Where(e => e.NullableStringA.IndexOf("oo") != e.NullableStringB.IndexOf("ar")).Select(e => e.Id),
                 ss => ss.Set<NullSemanticsEntity1>().Where(
-                    e => MaybeScalar<int>(e.NullableStringA, () => e.NullableStringA.IndexOf("oo"))
-                        != MaybeScalar<int>(
-                            e.NullableStringB, () => e.NullableStringB.IndexOf("ar"))).Select(e => e.Id));
+                    e => MaybeScalar2<string, int>(e.NullableStringA, x => x.IndexOf("oo"))
+                        != MaybeScalar2<string, int>(
+                            e.NullableStringB, x => x.IndexOf("ar"))).Select(e => e.Id));
 
             await AssertQueryScalar(
                 async,
                 ss => ss.Set<NullSemanticsEntity1>().Where(e => e.NullableStringA.IndexOf("oo") != e.NullableStringA.IndexOf("ar")).Select(e => e.Id),
                 ss => ss.Set<NullSemanticsEntity1>().Where(
-                    e => MaybeScalar<int>(e.NullableStringA, () => e.NullableStringA.IndexOf("oo"))
-                        != MaybeScalar<int>(
-                            e.NullableStringA, () => e.NullableStringA.IndexOf("ar"))).Select(e => e.Id));
+                    e => MaybeScalar2<string, int>(e.NullableStringA, x => x.IndexOf("oo"))
+                        != MaybeScalar2<string, int>(
+                            e.NullableStringA, x => x.IndexOf("ar"))).Select(e => e.Id));
         }
 
         [ConditionalTheory]
