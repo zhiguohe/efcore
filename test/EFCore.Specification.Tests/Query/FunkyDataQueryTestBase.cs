@@ -158,11 +158,15 @@ namespace Microsoft.EntityFrameworkCore.Query
         {
             await AssertQuery(
                 async,
-                ss => ss.Set<FunkyCustomer>().Where(c => c.FirstName.StartsWith("%B")).Select(c => c.FirstName));
+                ss => ss.Set<FunkyCustomer>().Where(c => c.FirstName.StartsWith("%B")).Select(c => c.FirstName),
+                ss => ss.Set<FunkyCustomer>().Where(c => MaybeScalar2<string, bool>(c.FirstName, x => x.StartsWith("%B")) == true)
+                    .Select(c => c.FirstName));
 
             await AssertQuery(
                 async,
-                ss => ss.Set<FunkyCustomer>().Where(c => c.FirstName.StartsWith("a_")).Select(c => c.FirstName));
+                ss => ss.Set<FunkyCustomer>().Where(c => c.FirstName.StartsWith("a_")).Select(c => c.FirstName),
+                ss => ss.Set<FunkyCustomer>().Where(c => MaybeScalar2<string, bool>(c.FirstName, x => x.StartsWith("a_")) == true)
+                    .Select(c => c.FirstName));
 
             await AssertQuery(
                 async,
@@ -203,12 +207,16 @@ namespace Microsoft.EntityFrameworkCore.Query
             var prm1 = "%B";
             await AssertQuery(
                 async,
-                ss => ss.Set<FunkyCustomer>().Where(c => c.FirstName.StartsWith(prm1)).Select(c => c.FirstName));
+                ss => ss.Set<FunkyCustomer>().Where(c => c.FirstName.StartsWith(prm1)).Select(c => c.FirstName),
+                ss => ss.Set<FunkyCustomer>().Where(c => MaybeScalar2<string, bool>(c.FirstName, x => x.StartsWith(prm1)) == true)
+                    .Select(c => c.FirstName));
 
             var prm2 = "a_";
             await AssertQuery(
                 async,
-                ss => ss.Set<FunkyCustomer>().Where(c => c.FirstName.StartsWith(prm2)).Select(c => c.FirstName));
+                ss => ss.Set<FunkyCustomer>().Where(c => c.FirstName.StartsWith(prm2)).Select(c => c.FirstName),
+                ss => ss.Set<FunkyCustomer>().Where(c => MaybeScalar2<string, bool>(c.FirstName, x => x.StartsWith(prm2)) == true)
+                    .Select(c => c.FirstName));
 
             var prm3 = (string)null;
             await AssertQuery(

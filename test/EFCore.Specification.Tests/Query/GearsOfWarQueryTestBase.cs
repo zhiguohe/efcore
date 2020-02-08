@@ -1124,10 +1124,8 @@ namespace Microsoft.EntityFrameworkCore.Query
                 async,
                 ss => from t in ss.Set<CogTag>()
 #pragma warning disable IDE0031 // Use null propagation
-                      select t.Gear != null ? t.Gear.Nickname : null,
-#pragma warning restore IDE0031 // Use null propagation
-                ss => from t in ss.Set<CogTag>()
-                      select t.Gear != null ? Maybe(t.Gear, () => t.Gear.Nickname) : null);
+                      select t.Gear != null ? t.Gear.Nickname : null);
+//#pragma warning restore IDE0031 // Use null propagation
         }
 
         [ConditionalTheory]
@@ -3440,18 +3438,13 @@ namespace Microsoft.EntityFrameworkCore.Query
                         f => new
                         {
                             f.Id,
-                            Gears = Maybe(
-                                    ((LocustHorde)f).Commander,
-                                    () => Maybe(
-                                        ((LocustHorde)f).Commander.DefeatedBy,
-                                        () => ((Officer)((LocustHorde)f).Commander.DefeatedBy).Reports))
-                                ?? new List<Gear>()
+                            Gears = ((Officer)((LocustHorde)f).Commander.DefeatedBy).Reports
                         }),
                 elementSorter: e => e.Id,
                 elementAsserter: (e, a) =>
                 {
                     Assert.Equal(e.Id, a.Id);
-                    AssertCollection(e.Gears, a.Gears);
+                    AssertCollection(e.Gears ?? new List<Gear>(), a.Gears);
                 });
         }
 
@@ -4468,22 +4461,16 @@ namespace Microsoft.EntityFrameworkCore.Query
         {
             return AssertQuery(
                 async,
-                ss =>
-                    from t in ss.Set<CogTag>()
-                    join g in ss.Set<Gear>() on t.GearNickName equals g.Nickname into grouping
-                    from g in grouping.DefaultIfEmpty()
-                    where !g.HasSoulPatch
-                    select new { g.Nickname, WeaponNames = g.Weapons.Select(w => w.Name).ToList() },
-                //ss =>
-                //    from t in ss.Set<CogTag>()
-                //    join g in ss.Set<Gear>() on t.GearNickName equals g.Nickname into grouping
-                //    from g in grouping.DefaultIfEmpty()
-                //    where !MaybeScalar2<Gear, bool>(g, x => x.HasSoulPatch) == true
-                //    select new
-                //    {
-                //        Nickname = Maybe(g, () => g.Nickname),
-                //        WeaponNames = g == null ? new List<string>() : g.Weapons.Select(w => w.Name).ToList()
-                //    },
+                ss => from t in ss.Set<CogTag>()
+                      join g in ss.Set<Gear>() on t.GearNickName equals g.Nickname into grouping
+                      from g in grouping.DefaultIfEmpty()
+                      where !g.HasSoulPatch
+                      select new { g.Nickname, WeaponNames = g.Weapons.Select(w => w.Name).ToList() },
+                ss => from t in ss.Set<CogTag>()
+                      join g in ss.Set<Gear>() on t.GearNickName equals g.Nickname into grouping
+                      from g in grouping.DefaultIfEmpty()
+                      where g != null && !g.HasSoulPatch
+                      select new { g.Nickname, WeaponNames = g.Weapons.Select(w => w.Name).ToList() },
                 elementSorter: e => e.Nickname,
                 elementAsserter: (e, a) =>
                 {
@@ -4498,18 +4485,17 @@ namespace Microsoft.EntityFrameworkCore.Query
         {
             return AssertQuery(
                 async,
+                ss => from t in ss.Set<CogTag>()
+                      join g in ss.Set<Gear>() on t.GearNickName equals g.Nickname into grouping
+                      from g in grouping.DefaultIfEmpty()
+                      orderby t.Note
+                      select g.Weapons.Select(w => w.Name).ToList(),
                 ss =>
                     from t in ss.Set<CogTag>()
                     join g in ss.Set<Gear>() on t.GearNickName equals g.Nickname into grouping
                     from g in grouping.DefaultIfEmpty()
                     orderby t.Note
-                    select g.Weapons.Select(w => w.Name).ToList(),
-                //ss =>
-                //    from t in ss.Set<CogTag>()
-                //    join g in ss.Set<Gear>() on t.GearNickName equals g.Nickname into grouping
-                //    from g in grouping.DefaultIfEmpty()
-                //    orderby t.Note
-                //    select g != null ? g.Weapons.Select(w => w.Name).ToList() : new List<string>(),
+                    select g != null ? g.Weapons.Select(w => w.Name).ToList() : new List<string>(),
                 assertOrder: true,
                 elementAsserter: (e, a) => AssertCollection(e, a));
         }
@@ -4525,11 +4511,11 @@ namespace Microsoft.EntityFrameworkCore.Query
                     join o in ss.Set<Gear>().OfType<Officer>() on t.GearNickName equals o.Nickname into grouping
                     from o in grouping.DefaultIfEmpty()
                     select new { t.Note, ReportNames = o.Reports.Select(r => r.FullName).ToList() },
-                //ss =>
-                //    from t in ss.Set<CogTag>()
-                //    join o in ss.Set<Gear>().OfType<Officer>() on t.GearNickName equals o.Nickname into grouping
-                //    from o in grouping.DefaultIfEmpty()
-                //    select new { t.Note, ReportNames = o != null ? o.Reports.Select(r => r.FullName).ToList() : new List<string>() },
+                ss =>
+                    from t in ss.Set<CogTag>()
+                    join o in ss.Set<Gear>().OfType<Officer>() on t.GearNickName equals o.Nickname into grouping
+                    from o in grouping.DefaultIfEmpty()
+                    select new { t.Note, ReportNames = o != null ? o.Reports.Select(r => r.FullName).ToList() : new List<string>() },
                 elementSorter: e => e.Note,
                 elementAsserter: (e, a) =>
                 {
@@ -5015,7 +5001,7 @@ namespace Microsoft.EntityFrameworkCore.Query
             return AssertQuery(
                 async,
                 ss => ss.Set<Weapon>().OrderBy(w => w.Owner).ThenBy(w => w.Id).Select(w => w.Name),
-                ss => ss.Set<Weapon>().OrderBy(w => Maybe(w.Owner, () => w.Owner.Nickname))
+                ss => ss.Set<Weapon>().OrderBy(w => w.Owner.Nickname)
                     .ThenBy(w => MaybeScalar2<Gear, int>(w.Owner, x => x.SquadId))
                     .ThenBy(w => w.Id).Select(w => w.Name),
                 assertOrder: true);
@@ -5031,7 +5017,7 @@ namespace Microsoft.EntityFrameworkCore.Query
                     .ThenBy(w => w.Name),
                 ss => ss.Set<Weapon>()
                     .OrderBy(w => w.IsAutomatic)
-                    .ThenByDescending(w => Maybe(w.Owner, () => w.Owner.Nickname))
+                    .ThenByDescending(w => w.Owner.Nickname)
                     .ThenByDescending(w => MaybeScalar2<Gear, int>(w.Owner, x => x.SquadId))
                     .ThenBy(w => MaybeScalar2<Weapon, int>(w.SynergyWith, x => x.Id))
                     .ThenBy(w => w.Name),
@@ -5131,16 +5117,10 @@ namespace Microsoft.EntityFrameworkCore.Query
         {
             return AssertQuery(
                 async,
-                ss =>
-                    from s in ss.Set<Squad>()
-                    join w in ss.Set<Weapon>() on s equals w.Owner.Squad into grouping
-                    from w in grouping.DefaultIfEmpty()
-                    select new { SquadName = s.Name, WeaponName = w.Name },
-                //ss =>
-                //    from s in ss.Set<Squad>()
-                //    join w in ss.Set<Weapon>() on s equals Maybe(w.Owner, () => w.Owner.Squad) into grouping
-                //    from w in grouping.DefaultIfEmpty()
-                //    select new { SquadName = s.Name, WeaponName = Maybe(w, () => w.Name) },
+                ss => from s in ss.Set<Squad>()
+                      join w in ss.Set<Weapon>() on s equals w.Owner.Squad into grouping
+                      from w in grouping.DefaultIfEmpty()
+                      select new { SquadName = s.Name, WeaponName = w.Name },
                 elementSorter: e => (e.SquadName, e.WeaponName));
         }
 
@@ -6275,9 +6255,7 @@ namespace Microsoft.EntityFrameworkCore.Query
         {
             return AssertQuery(
                 async,
-                ss => ss.Set<Faction>().Where(f => f.Capital.Name != "Foo").Select(f => ((LocustHorde)f).Commander),
-                ss => ss.Set<Faction>().Where(f => Maybe(f.Capital, () => f.Capital.Name) != "Foo")
-                    .Select(f => ((LocustHorde)f).Commander));
+                ss => ss.Set<Faction>().Where(f => f.Capital.Name != "Foo").Select(f => ((LocustHorde)f).Commander));
         }
 
         [ConditionalTheory]
@@ -6725,8 +6703,7 @@ namespace Microsoft.EntityFrameworkCore.Query
                 (await Assert.ThrowsAsync<InvalidOperationException>(
                     () => AssertQuery(
                         async,
-                        ss => ss.Set<Faction>().SelectMany(f => f.Capital.BornGears).Include(g => g.Squad),
-                        ss => ss.Set<Faction>().SelectMany(f => Maybe(f.Capital, () => f.Capital.BornGears) ?? new List<Gear>()))))
+                        ss => ss.Set<Faction>().SelectMany(f => f.Capital.BornGears).Include(g => g.Squad))))
                 .Message);
         }
 
@@ -6904,7 +6881,7 @@ namespace Microsoft.EntityFrameworkCore.Query
                         t => new
                         {
                             HasSoulPatch = MaybeScalar2<Gear, bool>(t.Gear, x => x.HasSoulPatch) ?? false,
-                            Name = Maybe(t.Gear, () => t.Gear.Squad.Name)
+                            Name = t.Gear.Squad.Name
                         })
                     .Select(g => new { g.Key.HasSoulPatch, Name = Maybe(g.Key.Name, () => g.Key.Name.ToLower()) }),
                 elementSorter: e => (e.HasSoulPatch, e.Name));

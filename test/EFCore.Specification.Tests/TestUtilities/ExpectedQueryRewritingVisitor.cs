@@ -78,76 +78,76 @@ namespace Microsoft.EntityFrameworkCore.TestUtilities
             return base.VisitMember(memberExpression);
         }
 
-        protected override Expression VisitMethodCall(MethodCallExpression methodCallExpression)
-        {
-            if (methodCallExpression.Method.DeclaringType == typeof(Enumerable)
-                && methodCallExpression.Method.IsStatic
-                && methodCallExpression.Arguments.Count > 0
-                && (methodCallExpression.Type.IsNullableType() || methodCallExpression.Type == typeof(bool)))
-            {
-                var arguments = new List<Expression>();
-                foreach (var argument in methodCallExpression.Arguments)
-                {
-                    var newArgument = Visit(argument);
+        //protected override Expression VisitMethodCall(MethodCallExpression methodCallExpression)
+        //{
+        //    if (methodCallExpression.Method.DeclaringType == typeof(Enumerable)
+        //        && methodCallExpression.Method.IsStatic
+        //        && methodCallExpression.Arguments.Count > 0
+        //        && (methodCallExpression.Type.IsNullableType() || methodCallExpression.Type == typeof(bool)))
+        //    {
+        //        var arguments = new List<Expression>();
+        //        foreach (var argument in methodCallExpression.Arguments)
+        //        {
+        //            var newArgument = Visit(argument);
 
 
-                    arguments.Add(newArgument);
-                }
+        //            arguments.Add(newArgument);
+        //        }
 
-                var lambdaParameter = Expression.Parameter(arguments[0].Type, "x");
-                var updatedMethod = methodCallExpression.Update(
-                    methodCallExpression.Object,
-                    new[] { lambdaParameter }.Concat(arguments.Skip(1)));
+        //        var lambdaParameter = Expression.Parameter(arguments[0].Type, "x");
+        //        var updatedMethod = methodCallExpression.Update(
+        //            methodCallExpression.Object,
+        //            new[] { lambdaParameter }.Concat(arguments.Skip(1)));
 
-                var lambda = Expression.Lambda(updatedMethod, lambdaParameter);
+        //        var lambda = Expression.Lambda(updatedMethod, lambdaParameter);
 
-                var method = methodCallExpression.Type.IsNullableValueType()
-                    ? _maybeScalarMethod.MakeGenericMethod(arguments[0].Type, methodCallExpression.Type.UnwrapNullableType())
-                    : methodCallExpression.Type == typeof(bool)
-                        ? _maybeScalar2Method.MakeGenericMethod(arguments[0].Type, methodCallExpression.Type)
-                        : _maybeMethod.MakeGenericMethod(arguments[0].Type, methodCallExpression.Type);
+        //        var method = methodCallExpression.Type.IsNullableValueType()
+        //            ? _maybeScalarMethod.MakeGenericMethod(arguments[0].Type, methodCallExpression.Type.UnwrapNullableType())
+        //            : methodCallExpression.Type == typeof(bool)
+        //                ? _maybeScalar2Method.MakeGenericMethod(arguments[0].Type, methodCallExpression.Type)
+        //                : _maybeMethod.MakeGenericMethod(arguments[0].Type, methodCallExpression.Type);
 
-                var result = Expression.Call(method, arguments[0], lambda);
+        //        var result = Expression.Call(method, arguments[0], lambda);
 
-                return methodCallExpression.Type != typeof(bool)
-                    ? (Expression)result
-                    : Expression.Equal(
-                        result,
-                        Expression.Constant(true, typeof(bool?)));
-            }
+        //        return methodCallExpression.Type != typeof(bool)
+        //            ? (Expression)result
+        //            : Expression.Equal(
+        //                result,
+        //                Expression.Constant(true, typeof(bool?)));
+        //    }
 
-            if (methodCallExpression.Object != null)
-            {
-                if (methodCallExpression.Type.IsNullableType()
-                    || methodCallExpression.Type == typeof(bool))
-                {
-                    var callerExpression = Visit(methodCallExpression.Object);
-                    var arguments = new List<Expression>();
-                    foreach (var argument in methodCallExpression.Arguments)
-                    {
-                        arguments.Add(Visit(argument));
-                    }
+        //    if (methodCallExpression.Object != null)
+        //    {
+        //        if (methodCallExpression.Type.IsNullableType()
+        //            || methodCallExpression.Type == typeof(bool))
+        //        {
+        //            var callerExpression = Visit(methodCallExpression.Object);
+        //            var arguments = new List<Expression>();
+        //            foreach (var argument in methodCallExpression.Arguments)
+        //            {
+        //                arguments.Add(Visit(argument));
+        //            }
 
-                    var lambdaParameter = Expression.Parameter(callerExpression.Type, "x");
-                    var lambda = Expression.Lambda(methodCallExpression.Update(lambdaParameter, arguments), lambdaParameter);
+        //            var lambdaParameter = Expression.Parameter(callerExpression.Type, "x");
+        //            var lambda = Expression.Lambda(methodCallExpression.Update(lambdaParameter, arguments), lambdaParameter);
 
-                    var method = methodCallExpression.Type.IsNullableValueType()
-                        ? _maybeScalarMethod.MakeGenericMethod(callerExpression.Type, methodCallExpression.Type.UnwrapNullableType())
-                        : methodCallExpression.Type == typeof(bool)
-                            ? _maybeScalar2Method.MakeGenericMethod(callerExpression.Type, methodCallExpression.Type)
-                            : _maybeMethod.MakeGenericMethod(callerExpression.Type, methodCallExpression.Type);
+        //            var method = methodCallExpression.Type.IsNullableValueType()
+        //                ? _maybeScalarMethod.MakeGenericMethod(callerExpression.Type, methodCallExpression.Type.UnwrapNullableType())
+        //                : methodCallExpression.Type == typeof(bool)
+        //                    ? _maybeScalar2Method.MakeGenericMethod(callerExpression.Type, methodCallExpression.Type)
+        //                    : _maybeMethod.MakeGenericMethod(callerExpression.Type, methodCallExpression.Type);
 
-                    var result = Expression.Call(method, callerExpression, lambda);
+        //            var result = Expression.Call(method, callerExpression, lambda);
 
-                    return methodCallExpression.Type != typeof(bool)
-                        ? (Expression)result
-                        : Expression.Equal(
-                            result,
-                            Expression.Constant(true, typeof(bool?)));
-                }
-            }
+        //            return methodCallExpression.Type != typeof(bool)
+        //                ? (Expression)result
+        //                : Expression.Equal(
+        //                    result,
+        //                    Expression.Constant(true, typeof(bool?)));
+        //        }
+        //    }
 
-            return base.VisitMethodCall(methodCallExpression);
-        }
+        //    return base.VisitMethodCall(methodCallExpression);
+        //}
     }
 }
